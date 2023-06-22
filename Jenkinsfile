@@ -1,8 +1,3 @@
-node {
-  def sonarHome = tool 'SonarScanner 4.8';
-  echo ${sonarHome}
-}
-
 pipeline {
   agent any
   
@@ -13,7 +8,7 @@ pipeline {
     stage('sonarqube scan') {
       steps {
         withSonarQubeEnv('my-sonar') {
-           sh 'sonar-scanner'
+           sh '~/sonar/sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner'
         }
       }
     }
