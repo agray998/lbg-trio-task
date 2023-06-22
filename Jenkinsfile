@@ -1,4 +1,3 @@
-def sonarHome = tool 'SonarScanner 4.8';
 pipeline {
   agent any
   
@@ -9,7 +8,7 @@ pipeline {
     stage('sonarqube scan') {
       steps {
         withSonarQubeEnv('my-sonar') {
-           sh '${sonarHome}/bin/sonar-scanner'
+           sh 'sonar-scanner'
         }
       }
     }
