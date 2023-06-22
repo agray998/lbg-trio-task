@@ -1,10 +1,10 @@
+def sonarHome = tool 'SonarScanner 4.8';
 pipeline {
   agent any
   
   environment {
     DB_PASSWORD = credentials('DB_PASSWORD')
   }
-  def sonarHome = tool 'SonarScanner 4.8'; 
   stages {
     stage('sonarqube scan') {
       steps {
