@@ -1,3 +1,8 @@
+node {
+  def sonarHome = tool 'SonarScanner 4.8';
+  echo ${sonarHome}
+}
+
 pipeline {
   agent any
   
