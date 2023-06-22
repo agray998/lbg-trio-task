@@ -4,10 +4,9 @@ pipeline {
   environment {
     DB_PASSWORD = credentials('DB_PASSWORD')
   }
-  
+  def sonarHome = tool 'SonarScanner 4.8'; 
   stages {
     stage('sonarqube scan') {
-      def sonarHome = tool 'SonarScanner 4.8';
       steps {
         withSonarQubeEnv('my-sonar') {
            sh '${sonarHome}/bin/sonar-scanner'
