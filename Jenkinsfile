@@ -49,33 +49,11 @@ pipeline {
                 docker pull agray998/trio-task-rp
                 docker network inspect trio && sleep 1 || docker network create trio
                 docker volume inspect trio && sleep 1 || docker volume create trio
-                if [[ docker stop mysql ]]; then
-                  docker rm mysql
-                else
-                  if [[ docker rm mysql ]]; then
-                    sleep 1
-                  else
-                    sleep 1
-                  fi
-                fi
-                if [[ docker stop flask-app ]]; then
-                  docker rm flask-app
-                else
-                  if [[ docker rm flask-app ]]; then
-                    sleep 1
-                  else
-                    sleep 1
-                  fi
-                fi
-                if [[ docker stop nginx ]]; then
-                  docker rm nginx
-                else
-                  if [[ docker rm nginx ]]; then
-                    sleep 1
-                  else
-                    sleep 1
-                  fi
-                fi
+                
+                docker stop mysql && (docker rm mysql) || (docker rm mysql && sleep 1 || sleep 1)
+                docker stop flask-app && (docker rm flask-app) || (docker rm flask-app && sleep 1 || sleep 1)
+                docker stop nginx && (docker rm nginx) || (docker rm nginx && sleep 1 || sleep 1)
+
                 docker run -d -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} -v trio:/var/lib/mysql --network trio --name mysql agray998/trio-task-db
                 docker run -d -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} --network trio --name flask-app agray998/trio-task-app
                 docker run -d -p 80:80 --network trio --name nginx agray998/trio-task-rp
