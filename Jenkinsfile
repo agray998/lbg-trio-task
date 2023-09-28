@@ -49,28 +49,28 @@ pipeline {
                 docker pull agray998/trio-task-rp
                 docker network inspect trio && sleep 1 || docker network create trio
                 docker volume inspect trio && sleep 1 || docker volume create trio
-                if [ docker stop mysql ]; then
+                if [[ docker stop mysql ]]; then
                   docker rm mysql
                 else
-                  if [ docker rm mysql ]; then
+                  if [[ docker rm mysql ]]; then
                     sleep 1
                   else
                     sleep 1
                   fi
                 fi
-                if [ docker stop flask-app ]; then
+                if [[ docker stop flask-app ]]; then
                   docker rm flask-app
                 else
-                  if [ docker rm flask-app ]; then
+                  if [[ docker rm flask-app ]]; then
                     sleep 1
                   else
                     sleep 1
                   fi
                 fi
-                if [ docker stop nginx ]; then
+                if [[ docker stop nginx ]]; then
                   docker rm nginx
                 else
-                  if [ docker rm nginx ]; then
+                  if [[ docker rm nginx ]]; then
                     sleep 1
                   else
                     sleep 1
