@@ -1,26 +1,47 @@
 pipeline {
-  agent any
-  
-  environment {
-    DB_PASSWORD = credentials('DB_PASSWORD')
-  }
-  stages {
-    stage('sonarqube scan') {
-      steps {
-        withSonarQubeEnv('my-sonar') {
-           sh '~/sonar/sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner'
+    agent any
+    stages {
+        stage('Build images') {
+            steps {
+                sh '''
+                docker build -t agray998/trio-task-db:latest ./db
+                docker build -t agray998/trio-task-db:${BUILD_NUMBER} ./db
+                docker build -t agray998/trio-task-app:latest ./flask-app
+                docker build -t agray998/trio-task-app:${BUILD_NUMBER} ./flask-app
+                docker build -t agray998/trio-task-rp:latest ./nginx
+                docker build -t agray998/trio-task-rp:${BUILD_NUMBER} ./nginx
+                '''
+            }
         }
-      }
+        stage('Push Images') {
+            steps {
+                sh '''
+                docker push agray998/trio-task-db
+                docker push agray998/trio-task-db:${BUILD_NUMBER}
+                docker push agray998/trio-task-app
+                docker push agray998/trio-task-app:${BUILD_NUMBER}
+                docker push agray998/trio-task-rp
+                docker push agray998/trio-task-rp:${BUILD_NUMBER}
+                '''
+            }
+        }
+        stage('Deploy Containers') {
+            environment {
+                MYSQL_ROOT_PASSWORD = credentials('MYSQL_ROOT_PASSWORD')
+            }
+            steps {
+                sh '''
+                ssh jenkins@piers-appserver << EOF
+                docker pull agray998/trio-task-app
+                docker pull agray998/trio-task-db
+                docker pull agray998/trio-task-rp
+                docker network create trio
+                docker volume create trio
+                docker run -d -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} -v trio:/var/lib/mysql --network trio --name mysql agray998/trio-task-db
+                docker run -d -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} --network trio --name flask-app agray998/trio-task-app
+                docker run -d -p 80:80 --network trio --name nginx agray998/trio-task-rp
+                '''
+            }
+        }
     }
-    stage('build') {
-      steps {
-      	sh 'docker-compose build'
-      }
-    }
-    stage('run') {
-      steps {
-      	sh 'docker-compose up -d'
-    	}
-     }
-  }
 }
